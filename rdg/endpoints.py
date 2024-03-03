@@ -73,3 +73,8 @@ async def get_random_date(data: DateData):
     random_dates = [data.range_from + timedelta(seconds=int(td)) for td in random_seconds]
     
     return random_dates
+
+@router.post("/random-email")
+async def get_random_email(data: EmailData):
+    emails = await generate_email(data.length, data.amount, data.domain)
+    return emails

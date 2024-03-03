@@ -29,3 +29,20 @@ class DateData(BaseModel):
     range_from: datetime = datetime.now() - timedelta(days=365)
     range_to: datetime = datetime.now()
     amount: Optional[int] = 1
+
+class EmailData(BaseModel):
+    length: int = 7
+    domain: str = '@gmail.com'
+    amount: Optional[int] = 1
+
+    @validator('length')
+    def length_min_max(cls, v):
+        if v < 6 or v > 64:
+            raise ValueError('length must be between 6 and 64 characters')
+        return v
+    
+    @validator('domain')
+    def domain_max_length(cls, v):
+        if len(v) > 255:
+            raise ValueError('Domain length cannot exceed 255')
+        return v
