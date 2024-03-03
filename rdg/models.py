@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime,timedelta
 from pydantic import BaseModel, validator
 
 class IntData(BaseModel):
@@ -23,3 +24,8 @@ class FloatData(BaseModel):
         if v <= values["range_from"]:
             raise ValueError("range_to must be greater than range_from")
         return v
+    
+class DateData(BaseModel):
+    range_from: datetime = datetime.now() - timedelta(days=365)
+    range_to: datetime = datetime.now()
+    amount: Optional[int] = 1
