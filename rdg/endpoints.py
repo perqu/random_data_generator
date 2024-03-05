@@ -1,6 +1,8 @@
 from fastapi import APIRouter
+import re
 from rdg.functions import *
 from rdg.models import *
+from rdg.data import col_vars
 
 router = APIRouter()
 
@@ -98,5 +100,42 @@ async def get_random_email(data: EmailData):
 
 @router.post("/random-phone")
 async def get_random_phone(data: PhoneData):
+    """
+    Generates a list of random phone numbers.
+
+    Args:\n
+        data (PhoneData):
+            country (str): 
+                The country name for pick exact phone number length.
+            amount (int): 
+                The amount of email addresses to generate.
+
+
+    Returns:\n
+        list: 
+            A list containing the randomly generated email addresses.
+    """
     phones = await generate_phone(data.country, data.amount)
     return phones
+
+@router.post('/random-table')
+async def get_random_table(data: TableData):
+    code = data.code
+    #20[int]-f(10)-t(20)[float]-f(10)-t(20)-d(2)[date]-f(2023-03-06)-t(2024-03-05)[email]-l(7)-d(wp.pl)[phone]-c(poland)
+    amount = int(code[:code.find('[')])
+    rows = code.count('[')
+    #variables = []
+    output = None
+    for el in range(rows):
+        # Get column type
+        c1 = code.find('[')+1
+        c2 = code.find(']')
+        col_type = code[c1:c2]
+
+        output = col_vars[col_type]
+        return output
+
+
+        #variables.append(code[c1:c2])
+        code = code[c2+1:]
+    return output

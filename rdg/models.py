@@ -49,7 +49,7 @@ class EmailData(BaseModel):
         return v
     
 class PhoneData(BaseModel):
-    country: str
+    country: str = 'poland'
     amount: Optional[int] = 1
 
     @validator('country')
@@ -57,3 +57,6 @@ class PhoneData(BaseModel):
         if v.lower() not in phones:
             raise ValueError('There is no country like that')
         return v.lower()
+    
+class TableData(BaseModel):
+    code: str
