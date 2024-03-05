@@ -76,5 +76,27 @@ async def get_random_date(data: DateData):
 
 @router.post("/random-email")
 async def get_random_email(data: EmailData):
-    emails = await generate_email(data.length, data.amount, data.domain)
+    """
+    Generates a list of random email addresses.
+
+    Args:\n
+        data (EmailData):
+            length (int): 
+                The length of the username part of the email addresses.
+            domain (str): 
+                The domain name for the email addresses.
+            amount (int): 
+                The amount of email addresses to generate.
+
+
+    Returns:\n
+        list: 
+            A list containing the randomly generated email addresses.
+    """
+    emails = await generate_email(data.length, data.domain, data.amount)
     return emails
+
+@router.post("/random-phone")
+async def get_random_phone(data: PhoneData):
+    phones = await generate_phone(data.country, data.amount)
+    return phones

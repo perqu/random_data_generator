@@ -1,6 +1,7 @@
 from typing import Optional
 from datetime import datetime,timedelta
 from pydantic import BaseModel, validator
+from rdg.data import phones
 
 class IntData(BaseModel):
     range_from: int = 0
@@ -46,3 +47,13 @@ class EmailData(BaseModel):
         if len(v) > 255:
             raise ValueError('Domain length cannot exceed 255')
         return v
+    
+class PhoneData(BaseModel):
+    country: str
+    amount: Optional[int] = 1
+
+    @validator('country')
+    def country_exists(cls, v):
+        if v.lower() not in phones:
+            raise ValueError('There is no country like that')
+        return v.lower()
