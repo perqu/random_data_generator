@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-import re
+from fastapi.responses import JSONResponse
+import json
 from rdg.functions import *
 from rdg.models import *
 from rdg.data import col_vars
-
 router = APIRouter()
 
 @router.post("/random-int")
@@ -70,11 +70,8 @@ async def get_random_date(data: DateData):
         list: 
             A list containing the randomly generated datetime objects.
     """
-    delta = data.range_to - data.range_from
-    random_seconds = np.random.randint(delta.total_seconds(), size=data.amount)
-    random_dates = [data.range_from + timedelta(seconds=int(td)) for td in random_seconds]
-    
-    return random_dates
+    result = await generate_date(data.range_from, data.range_to, data.amount)
+    return result
 
 @router.post("/random-email")
 async def get_random_email(data: EmailData):
@@ -120,22 +117,67 @@ async def get_random_phone(data: PhoneData):
 
 @router.post('/random-table')
 async def get_random_table(data: TableData):
+    """
+    Generates a random table based on the provided TableData.
+
+    Parameters:\n
+        data (TableData): An object containing the code specifying the structure of the table.
+
+    Returns:\n
+        List[List]: A list of lists representing the generated random table.
+
+    Example:\n
+        First value represents number of rows.
+        If code is "20[int](10)(20)[float](10)(20)(2)[date](2023-03-06)(2024-03-05)[email](7)(@wp.pl)[phone](poland)", 
+        it generates a random table with 5 columns and 20 rows:
+        - The first column contains integers between 10 and 20.
+        - The second column contains floats between 10 and 20.
+        - The third column contains dates between 2023-03-06 and 2024-03-05.
+        - The fourth column contains emails with 7 letters and "@wp.pl" as domain.
+        - The fifth column contains phones from Poland.
+
+        [INT](from)(to)
+        [FLOAT](from)(to)(decimals)
+        [DATE](from)(to)
+        [EMAIL](letters)(@domain)
+        [phone](country)
+
+    """
     code = data.code
-    #20[int]-f(10)-t(20)[float]-f(10)-t(20)-d(2)[date]-f(2023-03-06)-t(2024-03-05)[email]-l(7)-d(wp.pl)[phone]-c(poland)
-    amount = int(code[:code.find('[')])
-    rows = code.count('[')
-    #variables = []
-    output = None
-    for el in range(rows):
+    is_valid, message = is_valid_code(code)
+    if not is_valid:
+        return {"error": message}
+    
+    col_names = []
+    cols = []
+    num_cols = code.count('[')
+    num_rows = int(code[:code.find('[')])
+    for _ in range(num_cols):
         # Get column type
         c1 = code.find('[')+1
         c2 = code.find(']')
+
+        variables = []
+
         col_type = code[c1:c2]
-
-        output = col_vars[col_type]
-        return output
-
-
-        #variables.append(code[c1:c2])
+        col_names.append(col_type)
         code = code[c2+1:]
-    return output
+
+        var_types = col_vars[col_type]
+        for vt in var_types:
+            c11 = code.find('(')+1
+            c12 = code.find(')')
+            variable = code[c11:c12]
+            code = code[c12+1:]
+            if vt == 'i':
+                variable = int(variable)
+            elif vt == 'f':
+                variable = float(variable)
+            elif vt == 'd':
+                variable = datetime.strptime(variable, "%Y-%m-%d")
+            else:
+                pass
+            variables.append(variable)
+
+        cols.append(await generate_functions[col_type](*variables, num_rows))
+    return list(zip(*cols))

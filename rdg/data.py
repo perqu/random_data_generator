@@ -13,11 +13,11 @@ def read_phones(file_path):
 phones = read_phones("data/phones.csv")
 
 col_vars = {
-    'int': ['f', 't'],
-    'float': ['f', 't', 'd'],
-    'date': ['f', 't'],
-    'email': ['l', 'd'],
-    'phone': ['c']
+    'int': ['i', 'i'],
+    'float': ['f', 'f', 'i'],
+    'date': ['d', 'd'],
+    'email': ['i', 's'],
+    'phone': ['s']
 }
 
 #20[int]-f(10)-t(20)[float]-f(10)-t(20)-d(2)[date]-f(2023-03-06)-t(2024-03-05)[email]-l(7)-d(wp.pl)[phone]-c(poland)
