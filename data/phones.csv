@@ -1,7 +1,7 @@
 "country","phoneNumberLengthByCountry_phLengthMax","phoneNumberLengthByCountry_phLengthMin","phoneNumberLengthByCountry_phLength","phoneNumberLengthByCountry_CountryCode","phoneNumberLengthByCountry_phLength_InternationalPrefix","phoneNumberLengthByCountry_phLength_NationalPrefix","phoneNumberLengthByCountry_Notes"
 "India",10,7,"7 to 10",91,0,0,
 "China",12,5,"5 to 12",86,0,0,
-"United States",10,10,10,1,11,1,"Eastern Time UTC-5/DST-4; Central Time UTC-6/DST-5; Mountain Time UTC-7; Pacific Time UTC-8/DST-7; Alaska UTC-9/DST-8; Hawaiian UTC-10."
+"USA",10,10,10,1,11,1,"Eastern Time UTC-5/DST-4; Central Time UTC-6/DST-5; Mountain Time UTC-7; Pacific Time UTC-8/DST-7; Alaska UTC-9/DST-8; Hawaiian UTC-10."
 "Indonesia",10,5,"5 to 10",62,1.008,0,"Western Indonesia including Sumatra, Java, Madura and Bali UTC+7; Central Indonesia including Kalimantan (Borneo), Sulawesi (Celebes) and Nusatengarra (Lesser Sunda) UTC+8; Eastern Indonesia including Maluku (Moluccas) and Irianjaya (Irian) UTC+9."
 "Pakistan",11,8,"8 to 11",92,0,0,
 "Nigeria",10,7,"7 to 10",234,9,0,

@@ -1,6 +1,4 @@
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
-import json
 from rdg.functions import *
 from rdg.models import *
 from rdg.data import col_vars
@@ -128,12 +126,12 @@ async def get_random_table(data: TableData):
 
     Example:\n
         First value represents number of rows.
-        If code is "20[int](10)(20)[float](10)(20)(2)[date](2023-03-06)(2024-03-05)[email](7)(@wp.pl)[phone](poland)", 
+        If code is "20[int](10)(20)[float](10)(20)(2)[date](2023-03-06)(2024-03-05)[email](7)(wp.pl)[phone](poland)", 
         it generates a random table with 5 columns and 20 rows:
         - The first column contains integers between 10 and 20.
         - The second column contains floats between 10 and 20.
         - The third column contains dates between 2023-03-06 and 2024-03-05.
-        - The fourth column contains emails with 7 letters and "@wp.pl" as domain.
+        - The fourth column contains emails with 7 letters and "wp.pl" as domain.
         - The fifth column contains phones from Poland.
 
         [INT](from)(to)
@@ -143,41 +141,44 @@ async def get_random_table(data: TableData):
         [phone](country)
 
     """
-    code = data.code
-    is_valid, message = is_valid_code(code)
-    if not is_valid:
-        return {"error": message}
-    
-    col_names = []
-    cols = []
-    num_cols = code.count('[')
-    num_rows = int(code[:code.find('[')])
-    for _ in range(num_cols):
-        # Get column type
-        c1 = code.find('[')+1
-        c2 = code.find(']')
+    try:
+        code = data.code
+        is_valid, message = is_valid_code(code)
+        if not is_valid:
+            return {"error": message}
+        
+        col_names = []
+        cols = []
+        num_cols = code.count('[')
+        num_rows = int(code[:code.find('[')])
+        for _ in range(num_cols):
+            # Get column type
+            c1 = code.find('[')+1
+            c2 = code.find(']')
 
-        variables = []
+            variables = []
 
-        col_type = code[c1:c2]
-        col_names.append(col_type)
-        code = code[c2+1:]
+            col_type = code[c1:c2]
+            col_names.append(col_type)
+            code = code[c2+1:]
 
-        var_types = col_vars[col_type]
-        for vt in var_types:
-            c11 = code.find('(')+1
-            c12 = code.find(')')
-            variable = code[c11:c12]
-            code = code[c12+1:]
-            if vt == 'i':
-                variable = int(variable)
-            elif vt == 'f':
-                variable = float(variable)
-            elif vt == 'd':
-                variable = datetime.strptime(variable, "%Y-%m-%d")
-            else:
-                pass
-            variables.append(variable)
+            var_types = col_vars[col_type]
+            for vt in var_types:
+                c11 = code.find('(')+1
+                c12 = code.find(')')
+                variable = code[c11:c12]
+                code = code[c12+1:]
+                if vt == 'i':
+                    variable = int(variable)
+                elif vt == 'f':
+                    variable = float(variable)
+                elif vt == 'd':
+                    variable = datetime.strptime(variable, "%Y-%m-%d")
+                else:
+                    pass
+                variables.append(variable)
 
-        cols.append(await generate_functions[col_type](*variables, num_rows))
-    return list(zip(*cols))
+            cols.append(await generate_functions[col_type](*variables, num_rows))
+        return list(zip(*cols))
+    except:
+        return "Bad code"

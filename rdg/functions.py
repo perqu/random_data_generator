@@ -17,7 +17,7 @@ async def generate_date(range_from: datetime, range_to: datetime, amount) -> lis
 
 async def generate_email(length: int, domain: str, amount: int) -> list[str]:
     chars = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
-    return [''.join(np.random.choice(chars, length))+domain for _ in range(amount)]
+    return [''.join(np.random.choice(chars, length))+"@"+domain for _ in range(amount)]
     
 async def generate_phone(country: str, amount: int) -> list[int]:
     l = phones[country]

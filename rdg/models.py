@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime,timedelta
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, field_validator, ValidationInfo
 from rdg.data import phones
 
 class IntData(BaseModel):
@@ -8,9 +8,9 @@ class IntData(BaseModel):
     range_to: int = 100
     amount: Optional[int] = 1
 
-    @validator("range_to")
-    def range_to_greater_than_range_from(cls, v, values):
-        if v <= values["range_from"]:
+    @field_validator("range_to")
+    def range_to_greater_than_range_from(cls, v, info: ValidationInfo):
+        if v <= info.data.get('range_from'):
             raise ValueError("range_to must be greater than range_from")
         return v
     
@@ -20,9 +20,9 @@ class FloatData(BaseModel):
     decimal_places: int = 2
     amount: Optional[int] = 1
 
-    @validator("range_to")
-    def range_to_greater_than_range_from(cls, v, values):
-        if v <= values["range_from"]:
+    @field_validator("range_to")
+    def range_to_greater_than_range_from(cls, v, info: ValidationInfo):
+        if v <= info.data.get("range_from"):
             raise ValueError("range_to must be greater than range_from")
         return v
     
@@ -36,13 +36,13 @@ class EmailData(BaseModel):
     domain: str = '@gmail.com'
     amount: Optional[int] = 1
 
-    @validator('length')
+    @field_validator('length')
     def length_min_max(cls, v):
         if v < 6 or v > 64:
             raise ValueError('length must be between 6 and 64 characters')
         return v
     
-    @validator('domain')
+    @field_validator('domain')
     def domain_max_length(cls, v):
         if len(v) > 255:
             raise ValueError('Domain length cannot exceed 255')
@@ -52,7 +52,7 @@ class PhoneData(BaseModel):
     country: str = 'poland'
     amount: Optional[int] = 1
 
-    @validator('country')
+    @field_validator('country')
     def country_exists(cls, v):
         if v.lower() not in phones:
             raise ValueError('There is no country like that')
